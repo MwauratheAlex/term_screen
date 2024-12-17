@@ -8,7 +8,7 @@ with open("input.bin", "wb") as f:
 
     # Draw character (0x02)
     # x: 5, y: 3, Color: 10 (0x0A), Character: 'A' (ASCII 0x41)
-    # f.write(bytes([0x02, 0x04, 0x05, 0x03, 0x0A, 0x41]))
+    f.write(bytes([0x02, 0x04, 0x05, 0x03, 0x0A, 0x41]))
 
     # Draw line (0x03)
     # Start: (0, 0), End: (15, 15), Color: 2 (0x02), Character: '-' (ASCII 0x2D)

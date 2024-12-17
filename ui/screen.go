@@ -12,9 +12,10 @@ type Config struct {
 }
 
 type Screen struct {
-	config             *Config
-	startingCursorPos  *Point
-	currCursorPosition *Point
+	config        *Config
+	buffer        [][]byte
+	origin        *Point // this will be our (0, 0)
+	currCursorPos *Point
 }
 
 func NewScreen() *Screen {
@@ -26,7 +27,8 @@ func (s *Screen) Setup(config *Config) error {
 		return fmt.Errorf("Width and Height must be creater than 0")
 	}
 
-	if config.ColorMode != 0x00 && config.ColorMode != 0x01 && config.ColorMode != 0x02 {
+	if config.ColorMode != 0x00 &&
+		config.ColorMode != 0x01 && config.ColorMode != 0x02 {
 		var sb strings.Builder
 		sb.WriteString("Invalid color mode.")
 		sb.WriteString("Wanted: 0x00 -> monochrome OR 0x01 - 16 colors OR 0x02 - 256 colors")
@@ -34,14 +36,14 @@ func (s *Screen) Setup(config *Config) error {
 	}
 
 	s.config = config
-	s.startingCursorPos = &Point{5, 2}
+	s.origin = &Point{5, 2}
 	s.ClearScreen()
 	s.drawBorder()
 
 	return nil
 }
 
-// DrawCharacter draws a character <ch> at position <pos>
+// DrawCharacter performs the drawing of the character <ch> at the position <pos>
 func (s *Screen) DrawCharacter(ch *Character, pos *Point) error {
 	if pos == nil {
 		return fmt.Errorf("Cannot draw character at <nil> position")
@@ -50,8 +52,7 @@ func (s *Screen) DrawCharacter(ch *Character, pos *Point) error {
 		return err
 	}
 	fmt.Printf("%s", string(ch.DisplayChar))
-	s.resetStyling()
-	fmt.Println() // prevents the showing of the percentage sign at cursor pos
+	s.reset()
 	return nil
 }
 
@@ -78,14 +79,16 @@ func (s *Screen) MoveCursor(pos *Point) error {
 	if pos == nil {
 		return fmt.Errorf("Cannot move cursor to <nil> position")
 	}
-	fmt.Printf("\033[%d;%dH", pos.Y, pos.X)
-	s.currCursorPosition = pos
+	// always move in reference to origin
+	newPos := s.origin.Add(pos)
+	fmt.Printf("\033[%d;%dH", newPos.Y, newPos.X)
+	s.currCursorPos = pos
 	return nil
 }
 
 // DrawAtCursor draws a character at the current cursor position
 func (s *Screen) DrawAtCursor(ch *Character) error {
-	return s.DrawCharacter(ch, s.currCursorPosition)
+	return s.DrawCharacter(ch, s.currCursorPos)
 }
 
 // ClearScreen deletes everything on the screen
@@ -98,9 +101,20 @@ func (s *Screen) IsSetup() bool {
 	return s.config != nil
 }
 
-// resetStyling resets any styling/color
-func (s *Screen) resetStyling() {
+// reset resets the terminal screen
+func (s *Screen) reset() {
+	// reset any styling/color
 	fmt.Printf("\033[0m")
+
+	// move cursor to final resting position
+	// this ensures borders are not deleted.
+	// e.g. if you draw a char above bottom border and leaving the cursor there,
+	// the rest of the bottom borders are deleted
+	// This ensures cursor is always at bottom border + 1 hence nothing in
+	// our screen gets deleted.
+	s.MoveCursor(&Point{0, s.config.Height})
+	// prevent '%' from appearing at cursor position
+	fmt.Println()
 }
 
 // drawBorder draws a border of the working area based on the screen dimensions
@@ -109,32 +123,29 @@ func (s *Screen) drawBorder() {
 		ColorIndex:  0x02,
 		DisplayChar: byte('*'),
 	}
-
 	// top
 	s.DrawLine(&Line{
-		StartPosition: s.startingCursorPos,
-		EndPosition:   s.startingCursorPos.Add(&Point{s.config.Width, 0}),
+		StartPosition: &Point{0, 0},
+		EndPosition:   &Point{s.config.Width, 0},
 		Ch:            borderCharacter,
 	})
 	// bottom
 	s.DrawLine(&Line{
-		StartPosition: s.startingCursorPos.Add(&Point{0, s.config.Height}),
-		EndPosition: s.startingCursorPos.Add(
-			&Point{s.config.Width, s.config.Height}),
-		Ch: borderCharacter,
+		StartPosition: &Point{0, s.config.Height},
+		EndPosition:   &Point{s.config.Width, s.config.Height},
+		Ch:            borderCharacter,
 	})
 	// left
 	s.DrawLine(&Line{
-		StartPosition: s.startingCursorPos,
-		EndPosition:   s.startingCursorPos.Add(&Point{0, s.config.Height}),
+		StartPosition: &Point{0, 0},
+		EndPosition:   &Point{0, s.config.Height},
 		Ch:            borderCharacter,
 	})
 	// right
 	s.DrawLine(&Line{
-		StartPosition: s.startingCursorPos.Add(&Point{s.config.Width, 0}),
-		EndPosition: s.startingCursorPos.Add(
-			&Point{s.config.Width, s.config.Height}),
-		Ch: borderCharacter,
+		StartPosition: &Point{s.config.Width, 0},
+		EndPosition:   &Point{s.config.Width, s.config.Height},
+		Ch:            borderCharacter,
 	})
 }
 
