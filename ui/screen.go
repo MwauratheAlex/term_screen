@@ -13,7 +13,6 @@ type Config struct {
 
 type Screen struct {
 	config        *Config
-	buffer        [][]byte
 	origin        *Point // this will be our (0, 0)
 	currCursorPos *Point
 }
@@ -22,6 +21,7 @@ func NewScreen() *Screen {
 	return &Screen{}
 }
 
+// Setup initializes the Screen
 func (s *Screen) Setup(config *Config) error {
 	if config.Width <= 0 || config.Height <= 0 {
 		return fmt.Errorf("Width and Height must be creater than 0")
@@ -97,6 +97,7 @@ func (s *Screen) ClearScreen() error {
 	return nil
 }
 
+// IsSetup returns true or false depencing on wheter screen has been setup
 func (s *Screen) IsSetup() bool {
 	return s.config != nil
 }
@@ -105,7 +106,6 @@ func (s *Screen) IsSetup() bool {
 func (s *Screen) reset() {
 	// reset any styling/color
 	fmt.Printf("\033[0m")
-
 	// move cursor to final resting position
 	// this ensures borders are not deleted.
 	// e.g. if you draw a char above bottom border and leaving the cursor there,
