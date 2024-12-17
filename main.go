@@ -21,6 +21,4 @@ func main() {
 		fmt.Fprintf(os.Stderr, "Error processing commands: %v", err)
 		os.Exit(1)
 	}
-
-	fmt.Println("Processing completed gracefully")
 }

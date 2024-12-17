@@ -17,7 +17,7 @@ func New(commandQueue <-chan *parser.Command) *processor {
 }
 
 func (p *processor) ProcessCommands() error {
-	term := ui.New()
+	term := ui.NewScreen()
 
 	for cmd := range p.cmdQueue {
 		if cmd == nil {
@@ -61,8 +61,10 @@ func (p *processor) ProcessCommands() error {
 					X: cmd.Data[2],
 					Y: cmd.Data[3],
 				},
-				ColorIndex: cmd.Data[4],
-				Character:  cmd.Data[5],
+				Ch: &ui.Character{
+					ColorIndex:  cmd.Data[4],
+					DisplayChar: cmd.Data[5],
+				},
 			}); err != nil {
 				return fmt.Errorf("Error drawing line: %v", err)
 			}
@@ -108,7 +110,6 @@ func (p *processor) ProcessCommands() error {
 			fmt.Println("EOF reached. Thankyou for using our program.")
 			fmt.Println("Press 'X' or Ctrl+C to end the program.")
 		}
-		// fmt.Printf("Processing: %v\n", cmd)
 	}
 	return nil
 }
