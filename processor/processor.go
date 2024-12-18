@@ -95,7 +95,10 @@ func (p *processor) ProcessCommands() error {
 			if !p.screen.IsSetup() {
 				continue
 			}
-			if err := p.screen.MoveCursor(&ui.Point{}); err != nil {
+			if err := p.screen.MoveCursor(&ui.Point{
+				X: cmd.Data[0],
+				Y: cmd.Data[1],
+			}); err != nil {
 				return fmt.Errorf("Error moving cursor: %v", err)
 			}
 		case 0x06:

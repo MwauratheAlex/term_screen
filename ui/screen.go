@@ -104,16 +104,19 @@ func (s *Screen) DrawLine(line *Line) error {
 	return nil
 }
 
+// RenderText writes text to the screen
 func (s *Screen) RenderText(text *Text) error {
 	currPos := text.Position
 	for _, c := range text.Chars {
-		s.MoveCursor(currPos)
-		s.DrawAtCursor(&Character{
-			ColorIndex:  text.ColorIndex,
-			DisplayChar: c,
-		})
-		s.MoveCursor(currPos.Add(&Point{1, 0}))
-		s.reset()
+		s.DrawCharacter(
+			&Character{
+				DisplayChar: c,
+				ColorIndex:  text.ColorIndex,
+			},
+			currPos,
+		)
+		// TODO: implement wraping around
+		currPos = currPos.Add(&Point{1, 0})
 	}
 	return nil
 }
@@ -173,6 +176,12 @@ func (s *Screen) drawBorder() {
 		EndPosition:   &Point{s.config.Width, 0},
 		Ch:            borderCharacter,
 	})
+	// right
+	s.DrawLine(&Line{
+		StartPosition: &Point{s.config.Width, 0},
+		EndPosition:   &Point{s.config.Width, s.config.Height},
+		Ch:            borderCharacter,
+	})
 	// bottom
 	s.DrawLine(&Line{
 		StartPosition: &Point{0, s.config.Height},
@@ -183,12 +192,6 @@ func (s *Screen) drawBorder() {
 	s.DrawLine(&Line{
 		StartPosition: &Point{0, 0},
 		EndPosition:   &Point{0, s.config.Height},
-		Ch:            borderCharacter,
-	})
-	// right
-	s.DrawLine(&Line{
-		StartPosition: &Point{s.config.Width, 0},
-		EndPosition:   &Point{s.config.Width, s.config.Height},
 		Ch:            borderCharacter,
 	})
 }

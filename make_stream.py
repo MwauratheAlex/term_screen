@@ -15,15 +15,15 @@ with open("input.bin", "wb") as f:
 
     # Render text(0x04)
     # Start: (2, 2), Color: 1 (0x01), Text: "Hello" (ASCII)
-    # f.write(bytes([0x04, 0x08, 0x02, 0x02, 0x01]) + b"Hello")
+    f.write(bytes([0x04, 0x08, 0x02, 0x02, 0x01]) + b"Hello")
 
     # # Cursor movement (0x05)
-    # # Move cursor to (10, 10)
-    # f.write(bytes([0x05, 0x02, 0x0A, 0x0A]))
+    # # Move cursor to (15, 10)
+    f.write(bytes([0x05, 0x02, 0x0F, 0x0A]))
 
     # # Draw at cursor (0x06)
     # # Character: 'X' (ASCII 0x58), Color: 5 (0x05)
-    # f.write(bytes([0x06, 0x02, 0x58, 0x05]))
+    f.write(bytes([0x06, 0x02, 0x58, 0x05]))
 
     # # Clear screen (0x07)
     # # No additional data
