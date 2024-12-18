@@ -6,6 +6,7 @@ import (
 	"term_screen/parser"
 	"term_screen/processor"
 	"term_screen/reader"
+	"term_screen/ui"
 )
 
 func main() {
@@ -14,7 +15,9 @@ func main() {
 	parser := parser.New(byteQueue)
 	cmdQueue := parser.ParseQueue()
 
-	processor := processor.New(cmdQueue)
+	screen := ui.NewScreen()
+	processor := processor.New(cmdQueue, screen)
+
 	err := processor.ProcessCommands()
 
 	if err != nil {

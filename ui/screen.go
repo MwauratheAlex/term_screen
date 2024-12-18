@@ -2,7 +2,9 @@ package ui
 
 import (
 	"fmt"
+	"math"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -61,16 +63,58 @@ func (s *Screen) DrawLine(line *Line) error {
 	start := line.StartPosition
 	end := line.EndPosition
 
-	for x := start.X; x <= end.X; x++ {
-		for y := start.Y; y <= end.Y; y++ {
-			s.DrawCharacter(line.Ch, &Point{x, y})
-		}
+	dx := int(end.X) - int(start.X)
+	dy := int(end.Y) - int(start.Y)
+
+	isSteep := math.Abs(float64(dy)) > math.Abs(float64(dx))
+	if isSteep {
+		// swap x and y for steep lines
+		start.X, start.Y = start.Y, start.X
+		end.X, end.Y = end.Y, end.X
 	}
 
+	if start.X > end.X {
+		start, end = end, start
+	}
+
+	dx = int(end.X) - int(start.X)
+	dy = int(end.Y) - int(start.Y)
+	yStep := 1
+	if dy < 0 {
+		yStep = -1
+		dy = -dy
+	}
+
+	D := 2*dy - dx
+	y := start.Y
+
+	for x := int(start.X); x <= int(end.X); x++ {
+		if isSteep {
+			s.DrawCharacter(line.Ch, &Point{byte(y), byte(x)})
+		} else {
+			s.DrawCharacter(line.Ch, &Point{byte(x), byte(y)})
+		}
+		if D > 0 {
+			y += byte(yStep)
+			D -= 2 * dx
+		}
+		D += 2 * dy
+		time.Sleep(20 * time.Millisecond)
+	}
 	return nil
 }
 
 func (s *Screen) RenderText(text *Text) error {
+	currPos := text.Position
+	for _, c := range text.Chars {
+		s.MoveCursor(currPos)
+		s.DrawAtCursor(&Character{
+			ColorIndex:  text.ColorIndex,
+			DisplayChar: c,
+		})
+		s.MoveCursor(currPos.Add(&Point{1, 0}))
+		s.reset()
+	}
 	return nil
 }
 
