@@ -89,16 +89,19 @@ go build -o term main.go
 ```bash
 ./term < examples/input.bin
 ```
+![Basic testing output](examples/example_output/basic.png)
 
-### Merry Christmas
+### Christmas
 ```bash
 ./term < examples/xmas.bin
 ```
+![Christmas output](examples/example_output/xmas.png)
 
 ### Santa
 ```bash
 ./term < examples/santa.bin
 ```
+![Santa](examples/example_output/santa.png)
 
 ### Animated Santa
 - I added a delay command
@@ -112,6 +115,7 @@ but that's for later.
 ```bash
 ./term < examples/animated_santa.bin
 ```
+![Santa Animation](examples/example_output/animated_santa.gif)
 
 
 The binary generating scripts were mainly done with chatgpt.
