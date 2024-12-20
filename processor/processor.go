@@ -52,11 +52,6 @@ func (p *processor) ProcessCommands() error {
 			); err != nil {
 				return fmt.Errorf("Error drawing character: %v", err)
 			}
-			// fmt.Println("Character")
-			// fmt.Println(string(cmd.Data[3]))
-			// fmt.Println("Pos")
-			// fmt.Println(int(cmd.Data[0]))
-			// fmt.Println(int(cmd.Data[1]))
 		case 0x03:
 			if !p.screen.IsSetup() {
 				continue

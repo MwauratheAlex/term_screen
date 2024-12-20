@@ -7,6 +7,23 @@ import (
 	"time"
 )
 
+type Character struct {
+	ColorIndex  byte
+	DisplayChar byte
+}
+
+type Line struct {
+	StartPosition *Point
+	EndPosition   *Point
+	Ch            *Character
+}
+
+type Text struct {
+	Position   *Point
+	ColorIndex byte
+	Chars      []byte
+}
+
 type Config struct {
 	Width     byte
 	Height    byte
@@ -42,6 +59,15 @@ func (s *Screen) Setup(config *Config) error {
 	s.ClearScreen()
 	s.drawBorder()
 
+	switch config.ColorMode {
+	case 0x00:
+		fmt.Print("\033[0m") // monochrome
+	case 0x01:
+		fmt.Print("\033[32m") // Default to green for 16-color mode
+	case 0x02:
+		fmt.Print("\033[38;5;160m") // Default to red for 256-color mode
+	}
+
 	return nil
 }
 
@@ -53,6 +79,7 @@ func (s *Screen) DrawCharacter(ch *Character, pos *Point) error {
 	if err := s.MoveCursor(pos); err != nil {
 		return err
 	}
+	s.applyColor(ch.ColorIndex)
 	fmt.Printf("%s", string(ch.DisplayChar))
 	s.reset()
 	return nil
@@ -99,7 +126,7 @@ func (s *Screen) DrawLine(line *Line) error {
 			D -= 2 * dx
 		}
 		D += 2 * dy
-		time.Sleep(20 * time.Millisecond)
+		time.Sleep(10 * time.Millisecond)
 	}
 	return nil
 }
@@ -154,11 +181,6 @@ func (s *Screen) reset() {
 	// reset any styling/color
 	fmt.Printf("\033[0m")
 	// move cursor to final resting position
-	// this ensures borders are not deleted.
-	// e.g. if you draw a char above bottom border and leaving the cursor there,
-	// the rest of the bottom borders are deleted
-	// This ensures cursor is always at bottom border + 1 hence nothing in
-	// our screen gets deleted.
 	s.MoveCursor(&Point{0, s.config.Height})
 	// prevent '%' from appearing at cursor position
 	fmt.Println()
@@ -196,19 +218,22 @@ func (s *Screen) drawBorder() {
 	})
 }
 
-type Character struct {
-	ColorIndex  byte
-	DisplayChar byte
-}
+// applyColor applies the color based on config
+func (s *Screen) applyColor(colorIndex byte) {
+	switch s.config.ColorMode {
+	case 0x00:
+		// monochrome: reset styling
+		fmt.Print("\033[0m")
+	case 0x01:
+		// 16 colors: map index to ANSI codes
+		colorCode := 30 + (colorIndex % 8) // wrap around basic 8 colors
+		if colorIndex >= 8 {
+			colorCode += 60 // bright version
+		}
+		fmt.Printf("\033[%dm", colorCode)
+	case 0x02:
+		// 256 colors: Map index directly
+		fmt.Printf("\033[38;5;%dm", colorIndex)
 
-type Line struct {
-	StartPosition *Point
-	EndPosition   *Point
-	Ch            *Character
-}
-
-type Text struct {
-	Position   *Point
-	ColorIndex byte
-	Chars      []byte
+	}
 }
