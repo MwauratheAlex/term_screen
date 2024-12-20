@@ -101,12 +101,14 @@ go build -o term main.go
 ```
 
 ### Animated Santa
-I added a delay command
+- I added a delay command
+```bash
 [0x08, 0x00]
-The above byte sequence will delay for 1 millisecond
-Of course we could have specified the time in the command itself,
+```
+- The above byte sequence will delay for 1 millisecond
+- Of course we could have specified the time in the command itself,
 but that's for later.
-Here is an animated example.
+- Here is an animated example.
 ```bash
 ./term < examples/animated_santa.bin
 ```
