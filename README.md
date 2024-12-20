@@ -48,6 +48,9 @@ but that's for later.
 ```
 ![Santa Animation](examples/example_output/animated_santa.gif)
 
+- The animation can definately be better.
+- Feel free to fork and improve if you are interested.
+
 
 The binary generating scripts were mainly done with chatgpt.
 Have fun.
