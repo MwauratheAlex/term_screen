@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"term_screen/parser"
 	"term_screen/ui"
+	"time"
 )
 
 type processor struct {
@@ -114,8 +115,10 @@ func (p *processor) ProcessCommands() error {
 				return fmt.Errorf("Error clearing screen: %v", err)
 			}
 		case 0x08:
-			fmt.Println("EOF reached. Thankyou for using our program.")
-			fmt.Println("Press 'X' or Ctrl+C to end the program.")
+			// fmt.Println("EOF reached. Thankyou for using our program.")
+			// fmt.Println("Press 'X' or Ctrl+C to end the program.")
+			// delay
+			time.Sleep(1 * time.Millisecond)
 		}
 	}
 	return nil

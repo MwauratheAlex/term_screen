@@ -15,7 +15,8 @@ with open("input.bin", "wb") as f:
 
     # Render text(0x04)
     # Start: (2, 2), Color: 1 (0x01), Text: "Hello" (ASCII)
-    f.write(bytes([0x04, 0x08, 0x02, 0x02, 0x01]) + b"Hello")
+    f.write(bytes([0x04, 0x28, 0x02, 0x02, 0x01]) +
+            b"Merry Christmas from terminal screen.")
 
     # # Cursor movement (0x05)
     # # Move cursor to (15, 10)

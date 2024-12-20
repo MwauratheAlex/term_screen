@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"strings"
-	"time"
 )
 
 type Character struct {
@@ -57,7 +56,7 @@ func (s *Screen) Setup(config *Config) error {
 	s.config = config
 	s.origin = &Point{5, 2}
 	s.ClearScreen()
-	s.drawBorder()
+	// s.drawBorder()
 
 	switch config.ColorMode {
 	case 0x00:
@@ -126,7 +125,7 @@ func (s *Screen) DrawLine(line *Line) error {
 			D -= 2 * dx
 		}
 		D += 2 * dy
-		time.Sleep(10 * time.Millisecond)
+		// time.Sleep(10 * time.Millisecond)
 	}
 	return nil
 }

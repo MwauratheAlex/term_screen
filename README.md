@@ -83,3 +83,34 @@ go build -o term main.go
 ./term < input.bin
 # input.txt is assumed to be a file containing commands
 ```
+
+## Examples
+### Basic testing binary
+```bash
+./term < examples/input.bin
+```
+
+### Merry Christmas
+```bash
+./term < examples/xmas.bin
+```
+
+### Santa
+```bash
+./term < examples/santa.bin
+```
+
+### Animated Santa
+I added a delay command
+[0x08, 0x00]
+The above byte sequence will delay for 1 millisecond
+Of course we could have specified the time in the command itself,
+but that's for later.
+Here is an animated example.
+```bash
+./term < examples/animated_santa.bin
+```
+
+
+The binary generating scripts were mainly done with chatgpt.
+Have fun.
